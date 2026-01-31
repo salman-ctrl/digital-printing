@@ -2,86 +2,114 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CriteriaWeightController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\HomeController;
 use App\Models\Criteria;
 
-
 /*
 |--------------------------------------------------------------------------
-| Public Routes
+| PUBLIC ROUTES
 |--------------------------------------------------------------------------
 */
 
-Route::get('/', function () {
-    return view('welcome');
+// Public dashboard / landing page
+Route::get('/', [DashboardController::class, 'public'])->name('home');
+
+// Guest tidak bisa checkout, middleware 'auth' akan paksa login
+Route::middleware(['auth'])->group(function () {
+    Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
+    Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
 });
 
+Route::get('/produk', [ProductController::class, 'index'])
+    ->name('products.index');
+
 /*
 |--------------------------------------------------------------------------
-| Authenticated User Routes
+| AUTHENTICATED ROUTES
 |--------------------------------------------------------------------------
 */
-
 Route::middleware(['auth'])->group(function () {
 
-    // Dashboard User
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
+    /*
+    |--------------------------------------------------------------------------
+    | USER ROUTES
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware(['role:user'])->group(function () {
 
-    Route::get('/criteria-weights', function () {
-        return view('criteria_weights.create', [
-            'criterias' => Criteria::all()
-        ]);
-    })->name('criteria-weights.create');
+        // Dashboard user khusus
+        Route::get('/user/dashboard', function () {
+            return view('user.dashboard');
+        })->name('user.dashboard');
 
-    Route::post('/criteria-weights', [CriteriaWeightController::class, 'store'])
-    ->name('criteria-weights.store');
+        // Bisa juga pakai controller jika ada logic khusus
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // =========================
-    // KATALOG PRODUK
-    // =========================
-    // Route::get('/products', ...);
-    // Route::get('/products/{product}', ...);
+        // Resource CRUD
+        Route::resource('users', UserController::class);
+        Route::resource('categories', CategoryController::class);
+        Route::resource('orders', OrderController::class);
 
-    // =========================
-    // TOPSIS
-    // =========================
-    // Route::get('/topsis', ...);
-    // Route::post('/topsis/calculate', ...);
+        // Reports / Laporan
+        Route::get('/reports', [ReportController::class, 'index'])->name('reports');
 
-    // =========================
-    // CART
-    // =========================
-    // Route::get('/cart', ...);
-    // Route::post('/cart/add', ...);
-    // Route::delete('/cart/remove/{id}', ...);
+        // Criteria weights
+        Route::get('/criteria-weights', function () {
+            return view('criteria_weights.create', [
+                'criterias' => Criteria::all()
+            ]);
+        })->name('criteria-weights.create');
 
-    // =========================
-    // CHECKOUT & TRANSACTION
-    // =========================
-    // Route::get('/checkout', ...);
-    // Route::post('/checkout/process', ...);
+        Route::post('/criteria-weights', [CriteriaWeightController::class, 'store'])
+            ->name('criteria-weights.store');
+    });
 
-    // =========================
-    // PAYMENT (MIDTRANS)
-    // =========================
-    // Route::get('/payment/{transaction}', ...);
-    // Route::post('/payment/callback', ...);
+    /*
+    |--------------------------------------------------------------------------
+    | ADMIN ROUTES
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware(['role:admin'])->group(function () {
 
-    // =========================
-    // RIWAYAT TRANSAKSI
-    // =========================
-    // Route::get('/transactions', ...);
-    // Route::get('/transactions/{id}', ...);
+        Route::get('/admin/dashboard', function () {
+            return view('admin.dashboard');
+        })->name('admin.dashboard');
 
-    Route::get('/logout', function () {
-    auth()->logout();
-    request()->session()->invalidate();
-    request()->session()->regenerateToken();
-    return redirect('/');
-});
+        // TODO: CRUD kategori, produk, kriteria admin
+    });
 
+    /*
+    |--------------------------------------------------------------------------
+    | OWNER ROUTES
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware(['role:owner'])->group(function () {
 
+        Route::get('/owner/dashboard', function () {
+            return view('owner.dashboard');
+        })->name('owner.dashboard');
+
+        // TODO: laporan & hasil TOPSIS
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | LOGOUT ROUTE
+    |--------------------------------------------------------------------------
+    */
+    Route::post('/logout', function () {
+        auth()->logout();
+        request()->session()->invalidate();
+        request()->session()->regenerateToken();
+        return redirect('/');
+    })->name('logout');
 });
 
 require __DIR__.'/auth.php';
