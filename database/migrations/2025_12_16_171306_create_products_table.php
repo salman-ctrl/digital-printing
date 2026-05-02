@@ -16,7 +16,11 @@ return new class extends Migration
             $table->foreignId('category_id')->constrained()->cascadeOnDelete();
             $table->string('name');
             $table->text('description')->nullable();
-            $table->string('image')->nullable();
+            $table->string('image_primary')->nullable();
+            $table->decimal('harga', 15, 2);
+            $table->integer('stok')->default(0);
+            $table->boolean('installation_available')->default(false);
+            $table->decimal('installation_price', 12, 2)->default(0);
             $table->timestamps();
         });
 

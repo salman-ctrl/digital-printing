@@ -14,7 +14,13 @@ class TransactionDetail extends Model
         'product_specification_id',
         'quantity',
         'price',
-        'subtotal'
+        'subtotal',
+        'design_option',
+        'design_difficulty',
+        'design_cost',
+        'design_file',
+        'need_installation',
+        'installation_price'
     ];
 
     public function transaction()

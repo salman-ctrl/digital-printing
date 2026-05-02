@@ -12,7 +12,13 @@ class CartDetail extends Model
     protected $fillable = [
         'cart_id',
         'product_specification_id',
-        'quantity'
+        'quantity',
+        'design_option',
+        'design_difficulty',
+        'design_cost',
+        'design_file',
+        'need_installation',
+        'installation_price'
     ];
 
     public function cart()

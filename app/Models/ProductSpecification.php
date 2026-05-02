@@ -14,10 +14,11 @@ class ProductSpecification extends Model
         'material',
         'size',
         'finishing',
-        'price',
-        'quality_score',
-        'durability_score',
-        'texture_score'
+        'harga',
+        'kualitas_warna',
+        'daya_tahan',
+        'tekstur_bahan',
+        'ukuran_cetak'
     ];
 
     public function product()

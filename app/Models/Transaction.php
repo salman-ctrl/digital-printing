@@ -13,7 +13,9 @@ class Transaction extends Model
         'user_id',
         'order_code',
         'total_price',
-        'status'
+        'status',
+        'notes', // TAMBAHKAN INI: Agar catatan bisa disimpan ke DB
+        'snap_token'
     ];
 
     public function user()

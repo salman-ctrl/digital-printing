@@ -16,6 +16,8 @@ return new class extends Migration
             $table->foreignId('cart_id')->constrained()->cascadeOnDelete();
             $table->foreignId('product_specification_id')->constrained()->cascadeOnDelete();
             $table->integer('quantity');
+            $table->boolean('need_installation')->default(false);
+            $table->decimal('installation_price', 12, 2)->default(0);
             $table->timestamps();
         });
 
