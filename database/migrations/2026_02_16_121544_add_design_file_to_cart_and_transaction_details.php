@@ -4,31 +4,26 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
-    /**
-     * Run the migrations.
-     */
+return new class extends Migration {
     public function up(): void
     {
         Schema::table('cart_details', function (Blueprint $table) {
-            $table->string('design_file')->after('design_cost')->nullable();
+            if (!Schema::hasColumn('cart_details', 'design_file')) {
+                $table->string('design_file')->nullable();
+            }
         });
-
         Schema::table('transaction_details', function (Blueprint $table) {
-            $table->string('design_file')->after('design_cost')->nullable();
+            if (!Schema::hasColumn('transaction_details', 'design_file')) {
+                $table->string('design_file')->nullable();
+            }
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::table('cart_details', function (Blueprint $table) {
             $table->dropColumn('design_file');
         });
-
         Schema::table('transaction_details', function (Blueprint $table) {
             $table->dropColumn('design_file');
         });
