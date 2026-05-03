@@ -6,8 +6,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -15,25 +14,21 @@ return new class extends Migration
     {
         Schema::table('categories', function (Blueprint $table) {
             if (!Schema::hasColumn('categories', 'parent_id')) {
-                $table->foreignId('parent_id')->nullable()->after('id')->constrained('categories')->onDelete('cascade');
+                $table->foreignId('parent_id')->nullable()->constrained('categories')->onDelete('cascade');
             }
             if (!Schema::hasColumn('categories', 'slug')) {
-                $table->string('slug')->unique()->nullable()->after('name');
+                $table->string('slug')->unique()->nullable();
             }
             if (!Schema::hasColumn('categories', 'image')) {
-                $table->string('image')->nullable()->after('slug');
+                $table->string('image')->nullable();
             }
         });
 
-        // Update existing categories to have a slug if they don't have one
-        // This is safe to do even if slug column already existed but was empty
         DB::table('categories')->whereNull('slug')->orWhere('slug', '')->get()->each(function ($category) {
             DB::table('categories')->where('id', $category->id)->update([
                 'slug' => Str::slug($category->name) . '-' . $category->id
             ]);
         });
-        
-        // After updating slugs, we can make it non-nullable if we want, but keeping it nullable is safer for now.
     }
 
     /**
